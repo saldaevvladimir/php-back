@@ -2,31 +2,26 @@
 
 declare(strict_types=1);
 
-use App\Doctrine\ORM\UuidGenerator;
+namespace App\Entity;
+
 use App\Repository\TaskRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Types\UuidType;
-use Symfony\Component\Uid\Uuid;
 
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 #[ORM\Table(name: 'tasks')]
 #[ORM\HasLifecycleCallbacks()]
 class Task {
-
     #[ORM\Id]
-    #[ORM\Column(type: Uuid::NAME)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private ?Uuid $id = null;
+    #[ORM\Column]
+    #[ORM\GeneratedValue]
+    private ?int $id = null;
 
-    public function getId(): ?Uuid {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function setId(Uuid $id): self {
+    public function setId(int $id): void {
         $this->id = $id;
     }
 
@@ -37,7 +32,7 @@ class Task {
         return $this->name;
     }
 
-    public function setName(string $name): self {
+    public function setName(string $name): void {
         $this->name = $name;
     }
 
@@ -48,8 +43,8 @@ class Task {
         return $this->description;
     }
 
-    public function setDescription(string $description): self {
-        $this->description = description;
+    public function setDescription(string $description): void {
+        $this->description = $description;
     }
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: false)]
@@ -65,7 +60,7 @@ class Task {
     }
 
     #[ORM\PrePersist]
-    public function setCreatedAtValue(): self {
+    public function setCreatedAtValue(): void {
         $this->createdAt = new \DateTimeImmutable();
     }
 

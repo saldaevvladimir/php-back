@@ -2,31 +2,26 @@
 
 declare(strict_types=1);
 
-use App\Doctrine\ORM\UuidGenerator;
-use App\Repository\TaskRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+namespace App\Entity;
+
+use App\Repository\ProjectsGroupRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Types\UuidType;
-use Symfony\Component\Uid\Uuid;
 
 
 #[ORM\Entity(repositoryClass: ProjectsGroupRepository::class)]
-#[ORM\Table(name: 'tasks')]
+#[ORM\Table(name: 'projects_groups')]
 #[ORM\HasLifecycleCallbacks()]
 class ProjectsGroup {
-
     #[ORM\Id]
-    #[ORM\Column(type: Uuid::NAME)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    private ?Uuid $id = null;
+    #[ORM\Column]
+    #[ORM\GeneratedValue]
+    private ?int $id = null;
 
-    public function getId(): ?Uuid {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function setId(Uuid $id): self {
+    public function setId(int $id): void {
         $this->id = $id;
     }
 
@@ -37,7 +32,7 @@ class ProjectsGroup {
         return $this->name;
     }
 
-    public function setName(string $name): self {
+    public function setName(string $name): void {
         $this->name = $name;
     }
 
@@ -54,7 +49,7 @@ class ProjectsGroup {
     }
 
     #[ORM\PrePersist]
-    public function setCreatedAtValue(): self {
+    public function setCreatedAtValue(): void {
         $this->createdAt = new \DateTimeImmutable();
     }
 
