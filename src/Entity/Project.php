@@ -6,22 +6,31 @@ namespace App\Entity;
 
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ORM\Table(name: 'projects')]
 #[ORM\HasLifecycleCallbacks()]
 class Project {
-    #[ORM\Id]
-    #[ORM\Column]
-    #[ORM\GeneratedValue]
-    private ?int $id = null;
+    public function __construct() {
+        $this->id = Uuid::v4();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
-    public function getId(): ?int {
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id;
+
+    public function getId(): ?UuidType {
         return $this->id;
     }
 
-    public function setId(int $id): void {
+    public function setId(UuidType $id): void {
         $this->id = $id;
     }
 
