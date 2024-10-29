@@ -41,7 +41,7 @@ class Task {
         $this->name = $name;
     }
 
-    #[ORM\Column(name: 'description', length: 256)]
+    #[ORM\Column(name: 'description', type: 'text', nullable: true)]
 
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DatetimeImmutable $createdAt;
