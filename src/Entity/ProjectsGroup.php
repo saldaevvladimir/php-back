@@ -41,7 +41,7 @@ class ProjectsGroup {
         $this->name = $name;
     }
 
-    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: false)]
     private \DatetimeImmutable $createdAt;
 
     public function getCreatedAt(): \DateTimeImmutable {
@@ -58,7 +58,7 @@ class ProjectsGroup {
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: false)]
     private \DateTimeImmutable $updatedAt;
 
     public function getUpdatedAt(): \DateTimeImmutable {
