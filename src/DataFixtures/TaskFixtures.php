@@ -8,8 +8,7 @@ use App\Entity\Task;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use function App\helpers\generateRandomString;
-use function App\helpers\generateDatetimeBetween;
+use App\Utils\Helpers;
 
 
 class TaskFixtures extends Fixture {
@@ -19,10 +18,10 @@ class TaskFixtures extends Fixture {
         $date3 = new DateTimeImmutable('2024-10-10');
         for ($i = 0; $i < 80; $i++) {
             $task = new Task();
-            $task->setName(generateRandomString());
-            $task->setDescription(generateRandomString(20));
-            $task->setCreatedAt(generateDatetimeBetween($date1, $date2));
-            $task->setUpdatedAt(generateDatetimeBetween($date2, $date3));
+            $task->setName(Helpers::generateRandomString());
+            $task->setDescription(Helpers::generateRandomString(20));
+            $task->setCreatedAt(Helpers::generateDatetimeBetween($date1, $date2));
+            $task->setUpdatedAt(Helpers::generateDatetimeBetween($date2, $date3));
 
             $manager->persist($task);
         }

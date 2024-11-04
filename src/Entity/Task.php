@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 
+
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 #[ORM\Table(name: 'tasks')]
 #[ORM\HasLifecycleCallbacks()]
@@ -26,11 +27,11 @@ class Task {
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?Uuid $id;
 
-    public function getId(): ?UuidType {
+    public function getId(): ?Uuid {
         return $this->id;
     }
 
-    public function setId(UuidType $id): void {
+    public function setId(Uuid $id): void {
         $this->id = $id;
     }
 
