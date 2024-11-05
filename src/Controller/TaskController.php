@@ -1,81 +1,41 @@
 <?php
 
+declare(strict_types= 1);
+
 namespace App\Controller;
 
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/task')]
-final class TaskController extends AbstractController
-{
-    #[Route('/', name: 'app_task_index', methods: ['GET'])]
-    public function index(TaskRepository $taskRepository): Response
-    {
-        return $this->render('task/index.html.twig', [
-            'tasks' => $taskRepository->findAll(),
-        ]);
+#[Route('/tasks')]
+final class TaskController extends BaseController {
+    #[Route('/', name: 'tasks', methods: ['GET'], format: 'json')]
+    public function getTasks(TaskRepository $taskRepository): JsonResponse {
+        return $this->handleGetAll($taskRepository);
     }
 
-    #[Route('/new', name: 'app_task_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $task = new Task();
-        $form = $this->createForm(TaskType::class, $task);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($task);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('task/new.html.twig', [
-            'task' => $task,
-            'form' => $form,
-        ]);
+    #[Route('/add', name: 'add_task', methods: ['POST'], format: 'json')]
+    public function addTask(Request $request, EntityManagerInterface $em): JsonResponse {
+        return $this->handleAdd($request, $em, TaskType::class, new Task());
     }
 
-    #[Route('/{id}', name: 'app_task_show', methods: ['GET'])]
-    public function show(Task $task): Response
-    {
-        return $this->render('task/show.html.twig', [
-            'task' => $task,
-        ]);
+    #[Route('/{id}', name: 'get_task', methods: ['GET'], format: 'json')]
+    public function getTask(string $id, TaskRepository $taskRepository): JsonResponse {
+        return $this->handleGet($id, $taskRepository);
     }
 
-    #[Route('/{id}/edit', name: 'app_task_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Task $task, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(TaskType::class, $task);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('task/edit.html.twig', [
-            'task' => $task,
-            'form' => $form,
-        ]);
+    #[Route('/update/{id}', name: 'update_task', methods: ['PATCH'], format: 'json')]
+    public function updateTask(string $id, Request $request, EntityManagerInterface $em, TaskRepository $taskRepository): JsonResponse {
+        return $this->handleUpdate($id, $request, $em, TaskType::class, $taskRepository);
     }
 
-    #[Route('/{id}', name: 'app_task_delete', methods: ['POST'])]
-    public function delete(Request $request, Task $task, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($task);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_task_index', [], Response::HTTP_SEE_OTHER);
+    #[Route('/delete/{id}', name: 'delete_task', methods: ['DELETE'], format: 'json')]
+    public function deleteTask(string $id, EntityManagerInterface $em, TaskRepository $taskRepository): JsonResponse {
+        return $this->handleDelete($id, $em, TaskType::class, $taskRepository);
     }
 }
