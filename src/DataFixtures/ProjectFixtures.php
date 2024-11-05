@@ -8,8 +8,7 @@ use App\Entity\Project;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use function App\helpers\generateRandomString;
-use function App\helpers\generateDatetimeBetween;
+use App\Utils\Helpers;
 
 
 class ProjectFixtures extends Fixture {
@@ -19,9 +18,9 @@ class ProjectFixtures extends Fixture {
         $date3 = new DateTimeImmutable('2024-10-10');
         for ($i = 0; $i < 40; $i++) {
             $project = new Project();
-            $project->setName(generateRandomString());
-            $project->setCreatedAt(generateDatetimeBetween($date1, $date2));
-            $project->setUpdatedAt(generateDatetimeBetween($date2, $date3));
+            $project->setName(Helpers::generateRandomString());
+            $project->setCreatedAt(Helpers::generateDatetimeBetween($date1, $date2));
+            $project->setUpdatedAt(Helpers::generateDatetimeBetween($date2, $date3));
 
             $manager->persist($project);
         }

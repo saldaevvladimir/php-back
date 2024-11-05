@@ -26,3 +26,5 @@
 
 # all logs
 /logs/
+docker/logs/nginx/access.log
+docker/logs/nginx/error.log
