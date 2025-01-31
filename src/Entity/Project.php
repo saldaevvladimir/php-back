@@ -74,6 +74,20 @@ class Project {
         }
     }
 
+    #[ORM\ManyToOne(targetEntity: ProjectsGroup::class, inversedBy: 'projects')]
+    #[ORM\JoinColumn(name: 'project_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?ProjectsGroup $projectGroup = null;
+
+    public function getProjectsGroup(): ?ProjectsGroup {
+        return $this->projectGroup;
+    }
+
+    public function setProjectsGroup(?ProjectsGroup $projectGroup): static {
+        $this->projectGroup = $projectGroup;
+
+        return $this;
+    }
+
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DatetimeImmutable $createdAt;
 
