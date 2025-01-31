@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\ProjectsGroupRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -45,7 +46,40 @@ class ProjectsGroup {
         $this->name = $name;
     }
 
-    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: false)]
+    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'projectsGroup')]
+    private ArrayCollection $projects;
+
+    public function getProjects(): ArrayCollection {
+        return $this->projects;
+    }
+
+    public function setProjects(ArrayCollection $projects): static {
+        $this->projects = $projects;
+
+        return $this;
+    }
+
+    public function addProject(Project $project): static {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
+            $project->setProjectsGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): static {
+        if ($this->projects->contains($project)) {
+            $this->projects->removeElement($project);
+            if ($project->getProjectsGroup() === $this) {
+                $project->setProjectsGroup(null);
+            }
+        }
+
+        return $this;
+    }
+
+    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DatetimeImmutable $createdAt;
 
     public function getCreatedAt(): \DateTimeImmutable {
@@ -54,6 +88,7 @@ class ProjectsGroup {
 
     public function setCreatedAt(\DateTimeImmutable $createdAt): self {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -62,7 +97,7 @@ class ProjectsGroup {
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: false)]
+    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTimeImmutable $updatedAt;
 
     public function getUpdatedAt(): \DateTimeImmutable {
@@ -71,6 +106,7 @@ class ProjectsGroup {
 
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): self {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
