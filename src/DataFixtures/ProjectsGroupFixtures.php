@@ -12,22 +12,21 @@ use App\Utils\Helpers;
 
 
 class ProjectsGroupFixtures extends Fixture {
+    public const PROJECTS_GROUPS = 'projects-groups';
+
     public function load(ObjectManager $manager): void {
-        $date1 = new DateTimeImmutable('2020-01-01');
-        $date2 = new DateTimeImmutable('2022-10-10');
-        $date3 = new DateTimeImmutable('2024-10-10');
+        $projectsGroups = [];
+
         for ($i = 0; $i < 20; $i++) {
             $projectsGroup = new ProjectsGroup();
             $projectsGroup->setName(Helpers::generateRandomString());
-            $projectsGroup->setCreatedAt(Helpers::generateDatetimeBetween($date1, $date2));
-            $projectsGroup->setUpdatedAt(Helpers::generateDatetimeBetween($date2, $date3));
-
             $manager->persist($projectsGroup);
+            $projectsGroups[] = $projectsGroups;
         }
 
         $manager->flush();
+        $this->addReference(self::PROJECTS_GROUPS, $projectsGroups);
     }
-
 }
 
 ?>
