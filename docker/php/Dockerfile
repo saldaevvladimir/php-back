@@ -1,8 +1,29 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.3.13-fpm-alpine
 
-RUN apk add --no-cache curl git build-base zlib-dev oniguruma-dev autoconf bash sudo postgresql-dev && docker-php-ext-install pdo pdo_pgsql
+RUN apk add --no-cache \
+    zlib-dev \
+    curl \
+    g++ \
+    git \
+    build-base \
+    icu-dev \
+    zip \
+    libzip-dev \
+    libpq-dev \
+    bash \
+    sudo \
+    postgresql-dev \
+    oniguruma-dev \
+    autoconf \
+    && docker-php-ext-install intl opcache pdo pdo_pgsql pgsql \
+    && pecl install apcu \
+    && docker-php-ext-enable apcu \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install zip
 
-COPY . /var/www
-WORKDIR /var/www/html
+WORKDIR /var/www/project
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN curl -sS https://get.symfony.com/cli/installer | bash --
+RUN mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
