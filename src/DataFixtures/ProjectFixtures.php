@@ -5,7 +5,7 @@ declare(strict_types= 1);
 namespace App\DataFixtures;
 
 use App\Entity\Project;
-use DateTimeImmutable;
+use App\Entity\ProjectsGroup;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -13,22 +13,20 @@ use App\Utils\Helpers;
 
 
 class ProjectFixtures extends Fixture implements DependentFixtureInterface {
-    public const PROJECTS = 'projects';
-
     public function load(ObjectManager $manager): void {
-        $projectsGroups = $this->getReference(ProjectsGroupFixtures::PROJECTS_GROUPS);
-        $projects = [];
+        $projectsGroups = $manager->getRepository(ProjectsGroup::class)->findAll();
 
         foreach ($projectsGroups as $projectsGroup) {
-            $project = new Project();
-            $project->setName(Helpers::generateRandomString());
-            $project->setProjectsGroup($projectsGroup);
-            $manager->persist($project);
-            $projects[] = $project;
+            $projectsCount = rand(5, 10);
+            for ($i = 0; $i < $projectsCount; $i++) {
+                $project = new Project();
+                $project->setName(Helpers::generateRandomString());
+                $projectsGroup->addProject($project);
+                $manager->persist($project);
+            }
         }
 
         $manager->flush();
-        $this->addReference(self::PROJECTS, $projects);
     }
 
     public function getDependencies(): array {

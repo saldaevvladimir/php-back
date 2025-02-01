@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\ProjectRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -48,13 +49,13 @@ class Project {
     }
 
     #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
-    private ArrayCollection $tasks;
+    private Collection $tasks;
 
-    public function getTasks(): ArrayCollection {
+    public function getTasks(): Collection {
         return $this->tasks;
     }
 
-    public function setTasks($tasks): void {
+    public function setTasks(Collection $tasks): void {
         $this->tasks = $tasks;
     }
 
@@ -76,14 +77,14 @@ class Project {
 
     #[ORM\ManyToOne(targetEntity: ProjectsGroup::class, inversedBy: 'projects')]
     #[ORM\JoinColumn(name: 'project_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private ?ProjectsGroup $projectGroup = null;
+    private ?ProjectsGroup $projectsGroup = null;
 
     public function getProjectsGroup(): ?ProjectsGroup {
-        return $this->projectGroup;
+        return $this->projectsGroup;
     }
 
     public function setProjectsGroup(?ProjectsGroup $projectGroup): static {
-        $this->projectGroup = $projectGroup;
+        $this->projectsGroup = $projectGroup;
 
         return $this;
     }

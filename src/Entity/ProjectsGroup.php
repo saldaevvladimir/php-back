@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\ProjectsGroupRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
@@ -19,6 +20,7 @@ class ProjectsGroup {
         $this->id = Uuid::v4();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->projects = new ArrayCollection();
     }
 
     #[ORM\Id]
@@ -47,13 +49,13 @@ class ProjectsGroup {
     }
 
     #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'projectsGroup')]
-    private ArrayCollection $projects;
+    private Collection $projects;
 
-    public function getProjects(): ArrayCollection {
+    public function getProjects(): Collection {
         return $this->projects;
     }
 
-    public function setProjects(ArrayCollection $projects): static {
+    public function setProjects(Collection $projects): static {
         $this->projects = $projects;
 
         return $this;
