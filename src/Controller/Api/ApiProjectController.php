@@ -5,6 +5,7 @@ declare(strict_types= 1);
 namespace App\Controller\Api;
 
 use App\Entity\Project;
+use App\Factory\ProjectFactory;
 use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,8 +16,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/projects')]
 final class ApiProjectController extends BaseApiController {
     #[Route('/', name: 'projects_api', methods: ['GET'], format: 'json')]
-    public function getProjects(ProjectRepository $projectRepository): JsonResponse {
-        return $this->handleGetAll($projectRepository);
+    public function getProjects(ProjectRepository $projectRepository, ProjectFactory $projectFactory): JsonResponse {
+        return $this->handleGetAll($projectRepository, $projectFactory);
     }
 
     #[Route('/add', name: 'add_project_api', methods: ['POST'], format: 'json')]
@@ -25,8 +26,8 @@ final class ApiProjectController extends BaseApiController {
     }
 
     #[Route('/{id}', name: 'get_project_api', methods: ['GET'], format: 'json')]
-    public function getProject(string $id, ProjectRepository $projectRepository): JsonResponse {
-        return $this->handleGet($id, $projectRepository);
+    public function getProject(string $id, ProjectRepository $projectRepository, ProjectFactory $projectFactory): JsonResponse {
+        return $this->handleGet($id, $projectRepository, $projectFactory);
     }
 
     #[Route('/update/{id}', name: 'update_project_api', methods: ['PATCH'], format: 'json')]

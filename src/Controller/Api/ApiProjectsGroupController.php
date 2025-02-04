@@ -5,6 +5,7 @@ declare(strict_types= 1);
 namespace App\Controller\Api;
 
 use App\Entity\ProjectsGroup;
+use App\Factory\ProjectsGroupFactory;
 use App\Form\ProjectsGroupType;
 use App\Repository\ProjectsGroupRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,11 +14,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 
-#[Route('/api/project_groups')]
+#[Route('/api/projects_groups')]
 final class ApiProjectsGroupController extends BaseApiController {
     #[Route('/', name: 'project_groups_api', methods: ['GET'], format: 'json')]
-    public function getProjectsGroups(ProjectsGroupRepository $projectsGroupRepository): JsonResponse {
-        return $this->handleGetAll($projectsGroupRepository);
+    public function getProjectsGroups(ProjectsGroupRepository $projectsGroupRepository, ProjectsGroupFactory $projectsGroupFactory): JsonResponse {
+        return $this->handleGetAll($projectsGroupRepository, $projectsGroupFactory);
     }
 
     #[Route('/add', name: 'add_projects_group_api', methods: ['POST'], format: 'json')]
@@ -26,8 +27,8 @@ final class ApiProjectsGroupController extends BaseApiController {
     }
 
     #[Route('/{id}', name: 'get_projects_group_api', methods: ['GET'], format: 'json')]
-    public function getProjectsGroup(string $id, ProjectsGroupRepository $projectsGroupRepository): JsonResponse {
-        return $this->handleGet($id, $projectsGroupRepository);
+    public function getProjectsGroup(string $id, ProjectsGroupRepository $projectsGroupRepository, ProjectsGroupFactory $projectsGroupFactory): JsonResponse {
+        return $this->handleGet($id, $projectsGroupRepository, $projectsGroupFactory);
     }
 
     #[Route('/update/{id}', name: 'update_projects_group_api', methods: ['PATCH'], format: 'json')]

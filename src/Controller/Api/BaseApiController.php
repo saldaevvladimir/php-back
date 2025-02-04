@@ -55,24 +55,23 @@ abstract class BaseApiController extends AbstractController {
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
     
-    protected function handleGet(string $id, $repository): JsonResponse {
+    protected function handleGet(string $id, $repository, $dtoFactory): JsonResponse {
         $uuid = Uuid::fromString($id);
         $entity = $repository->find($uuid);
 
         if (!$entity) {
             return $this->json(['data'=> ['id'=> 'Not found']], 404);
         }
-        
-        return $this->json(['data'=> $entity]);
+
+        $dto = $dtoFactory->createFromEntity($entity);
+
+        return $this->json(['data' => $dto]);
     }
 
-    protected function handleGetAll($repository): JsonResponse {
+    protected function handleGetAll($repository, $dtoFactory): JsonResponse {
         $entities = $repository->findAll();
+        $dtos = $dtoFactory->createFromEntities($entities);
 
-        if (!$entities) {
-            return $this->json(['data'=> 'No entities found']);
-        }
-
-        return $this->json(['data'=> $entities]);
+        return $this->json(['data'=> $dtos]);
     }
 }

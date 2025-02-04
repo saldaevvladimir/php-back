@@ -5,6 +5,7 @@ declare(strict_types= 1);
 namespace App\Controller\Api;
 
 use App\Entity\Task;
+use App\Factory\TaskFactory;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,8 +16,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/tasks')]
 final class ApiTaskController extends BaseApiController {
     #[Route('/', name: 'tasks_api', methods: ['GET'], format: 'json')]
-    public function getTasks(TaskRepository $taskRepository): JsonResponse {
-        return $this->handleGetAll($taskRepository);
+    public function getTasks(TaskRepository $taskRepository, TaskFactory $taskDTOFactory): JsonResponse {
+        return $this->handleGetAll($taskRepository, $taskDTOFactory);
     }
 
     #[Route('/add', name: 'add_task_api', methods: ['POST'], format: 'json')]
@@ -25,8 +26,8 @@ final class ApiTaskController extends BaseApiController {
     }
 
     #[Route('/{id}', name: 'get_task_api', methods: ['GET'], format: 'json')]
-    public function getTask(string $id, TaskRepository $taskRepository): JsonResponse {
-        return $this->handleGet($id, $taskRepository);
+    public function getTask(string $id, TaskRepository $taskRepository, TaskFactory $taskDTOFactory): JsonResponse {
+        return $this->handleGet($id, $taskRepository, $taskDTOFactory);
     }
 
     #[Route('/update/{id}', name: 'update_task_api', methods: ['PATCH'], format: 'json')]
@@ -36,6 +37,6 @@ final class ApiTaskController extends BaseApiController {
 
     #[Route('/delete/{id}', name: 'delete_api', methods: ['DELETE'], format: 'json')]
     public function deleteTask(string $id, EntityManagerInterface $em, TaskRepository $taskRepository): JsonResponse {
-        return $this->handleDelete($id, $em, TaskType::class, $taskRepository);
+        return $this->handleDelete($id, $em, $taskRepository);
     }
 }
