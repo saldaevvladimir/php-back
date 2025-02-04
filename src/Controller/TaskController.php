@@ -8,34 +8,51 @@ use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/tasks')]
-final class TaskController extends BaseController {
-    #[Route('/', name: 'tasks', methods: ['GET'], format: 'json')]
-    public function getTasks(TaskRepository $taskRepository): JsonResponse {
-        return $this->handleGetAll($taskRepository);
+#[Route('/web/tasks')]
+final class TaskController extends AbstractController {
+    #[Route('/', name: 'tasks_web', methods: ['GET'])]
+    public function getTasks(TaskRepository $taskRepository): Response {
+        return $this->render('task/index.html.twig', [
+            'tasks' => $taskRepository->findAll()
+        ]);
     }
 
-    #[Route('/add', name: 'add_task', methods: ['POST'], format: 'json')]
-    public function addTask(Request $request, EntityManagerInterface $em): JsonResponse {
-        return $this->handleAdd($request, $em, TaskType::class, new Task());
+    #[Route('/{id}', name: 'get_task_web', methods: ['GET'])]
+    public function getTask(Task $task): Response {
+        return $this->render('task/show.html.twig', [
+            'task' => $task
+        ]);
     }
 
-    #[Route('/{id}', name: 'get_task', methods: ['GET'], format: 'json')]
-    public function getTask(string $id, TaskRepository $taskRepository): JsonResponse {
-        return $this->handleGet($id, $taskRepository);
+    #[Route('/edit/{id}', name: 'edit_task_web', methods: ['GET', 'POST'])]
+    public function editTask(Request $request, Task $task, EntityManagerInterface $em): Response {
+        $form = $this->createForm(TaskType::class, $task);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+
+            return $this->redirectToRoute('tasks_web', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('task/edit.html.twig', [
+            'task' => $task,
+            'form' => $form,
+        ]);
     }
 
-    #[Route('/update/{id}', name: 'update_task', methods: ['PATCH'], format: 'json')]
-    public function updateTask(string $id, Request $request, EntityManagerInterface $em, TaskRepository $taskRepository): JsonResponse {
-        return $this->handleUpdate($id, $request, $em, TaskType::class, $taskRepository);
-    }
+    #[Route('/delete/{id}', name: 'delete_task_web', methods: ['POST'])]
+    public function deleteTask(Request $request, Task $task, EntityManagerInterface $em): Response {
+        if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->request->get('_token'))) {
+            $em->remove($task);
+            $em->flush();
+        }
 
-    #[Route('/delete/{id}', name: 'delete_task', methods: ['DELETE'], format: 'json')]
-    public function deleteTask(string $id, EntityManagerInterface $em, TaskRepository $taskRepository): JsonResponse {
-        return $this->handleDelete($id, $em, TaskType::class, $taskRepository);
+        return $this->redirectToRoute('tasks_web', [], Response::HTTP_SEE_OTHER);
     }
 }

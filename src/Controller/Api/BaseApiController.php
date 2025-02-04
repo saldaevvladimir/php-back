@@ -2,7 +2,7 @@
 
 declare(strict_types= 1);
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Uid\Uuid;
 
 
-abstract class BaseController extends AbstractController {
+abstract class BaseApiController extends AbstractController {
     protected function handleAdd(Request $request, EntityManagerInterface $em, $formType, $entity): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $form = $this->createForm($formType, $entity);

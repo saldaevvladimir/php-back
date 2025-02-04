@@ -8,34 +8,51 @@ use App\Entity\Project;
 use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/projects')]
-final class ProjectController extends BaseController {
-    #[Route('/', name: 'projects', methods: ['GET'], format: 'json')]
-    public function getProjects(ProjectRepository $projectRepository): JsonResponse {
-        return $this->handleGetAll($projectRepository);
+#[Route('/web/projects')]
+final class ProjectController extends AbstractController {
+    #[Route('/', name: 'projects_web', methods: ['GET'])]
+    public function getProjects(ProjectRepository $projectRepository): Response {
+        return $this->render('project/index.html.twig', [
+            'projects' => $projectRepository->findAll(),
+        ]);
     }
 
-    #[Route('/add', name: 'add_project', methods: ['POST'], format: 'json')]
-    public function addProject(Request $request, EntityManagerInterface $em): JsonResponse {
-        return $this->handleAdd($request, $em, ProjectType::class, new Project());
+    #[Route('/{id}', name: 'get_project_web', methods: ['GET'])]
+    public function getProject(Project $project): Response {
+        return $this->render('project/show.html.twig', [
+            'project' => $project
+        ]);
     }
 
-    #[Route('/{id}', name: 'get_project', methods: ['GET'], format: 'json')]
-    public function getProject(string $id, ProjectRepository $projectRepository): JsonResponse {
-        return $this->handleGet($id, $projectRepository);
+    #[Route('/edit/{id}', name: 'edit_project_web', methods: ['GET', 'POST'])]
+    public function editProject(Request $request, Project $project, EntityManagerInterface $em): Response {
+        $form = $this->createForm(ProjectType::class, $project);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+
+            return $this->redirectToRoute('projects_web', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('project/edit.html.twig', [
+            'project' => $project,
+            'form' => $form,
+        ]);
     }
 
-    #[Route('/update/{id}', name: 'update_project', methods: ['PATCH'], format: 'json')]
-    public function updateProject(string $id, Request $request, EntityManagerInterface $em, ProjectRepository $projectRepository): JsonResponse {
-        return $this->handleUpdate($id, $request, $em, ProjectType::class, $projectRepository);
-    }
+    #[Route('/delete/{id}', name: 'delete_project_web', methods: ['POST'])]
+    public function deleteProject(Request $request, Project $project, EntityManagerInterface $em): Response {
+        if ($this->isCsrfTokenValid('delete' . $project->getId(), $request->request->get('_token'))) {
+            $em->remove($project);
+            $em->flush();
+        }
 
-    #[Route('/delete/{id}', name: 'delete_project', methods: ['DELETE'], format: 'json')]
-    public function deleteProject(string $id, EntityManagerInterface $em, ProjectRepository $projectRepository): JsonResponse {
-        return $this->handleDelete($id, $em, ProjectType::class, $projectRepository);
+        return $this->redirectToRoute('projects_web', [], Response::HTTP_SEE_OTHER);
     }
 }
