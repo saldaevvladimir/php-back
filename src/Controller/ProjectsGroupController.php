@@ -38,7 +38,7 @@ final class ProjectsGroupController extends AbstractController {
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
-            return $this->redirectToRoute('project_groups_web', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('projects_groups_web', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('projects_group/edit.html.twig', [
