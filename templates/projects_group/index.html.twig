@@ -22,9 +22,10 @@
                 <td>{{ projects_group.name }}</td>
                 <td>{{ projects_group.createdAt ? projects_group.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ projects_group.updatedAt ? projects_group.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
+                <td style="display: flex; flex-direction: row; gap: 10px;">
                     <a href="{{ path('get_projects_group_web', {'id': projects_group.id}) }}">show</a>
                     <a href="{{ path('edit_projects_group_web', {'id': projects_group.id}) }}">edit</a>
+                    {% include 'projects_group/_delete_form.html.twig' %}
                 </td>
             </tr>
         {% else %}

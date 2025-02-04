@@ -24,9 +24,10 @@
                 <td>{{ task.description }}</td>
                 <td>{{ task.createdAt ? task.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ task.updatedAt ? task.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
+                <td style="display: flex; flex-direction: row; gap: 10px;">
                     <a href="{{ path('get_task_web', {'id': task.id}) }}">show</a>
                     <a href="{{ path('edit_task_web', {'id': task.id}) }}">edit</a>
+                    {% include 'projects_group/_delete_form.html.twig' %}
                 </td>
             </tr>
         {% else %}
