@@ -2,7 +2,7 @@
 
 declare(strict_types= 1);
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Uid\Uuid;
 
 
-abstract class BaseController extends AbstractController {
+abstract class BaseApiController extends AbstractController {
     protected function handleAdd(Request $request, EntityManagerInterface $em, $formType, $entity): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $form = $this->createForm($formType, $entity);
@@ -55,24 +55,23 @@ abstract class BaseController extends AbstractController {
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
     
-    protected function handleGet(string $id, $repository): JsonResponse {
+    protected function handleGet(string $id, $repository, $dtoFactory): JsonResponse {
         $uuid = Uuid::fromString($id);
         $entity = $repository->find($uuid);
 
         if (!$entity) {
             return $this->json(['data'=> ['id'=> 'Not found']], 404);
         }
-        
-        return $this->json(['data'=> $entity]);
+
+        $dto = $dtoFactory->createFromEntity($entity);
+
+        return $this->json(['data' => $dto]);
     }
 
-    protected function handleGetAll($repository): JsonResponse {
+    protected function handleGetAll($repository, $dtoFactory): JsonResponse {
         $entities = $repository->findAll();
+        $dtos = $dtoFactory->createFromEntities($entities);
 
-        if (!$entities) {
-            return $this->json(['data'=> 'No entities found']);
-        }
-
-        return $this->json(['data'=> $entities]);
+        return $this->json(['data'=> $dtos]);
     }
 }
