@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\ProjectRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -18,6 +20,7 @@ class Project {
         $this->id = Uuid::v4();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->tasks = new ArrayCollection();
     }
 
     #[ORM\Id]
@@ -45,7 +48,48 @@ class Project {
         $this->name = $name;
     }
 
-    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: false)]
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $tasks;
+
+    public function getTasks(): Collection {
+        return $this->tasks;
+    }
+
+    public function setTasks(Collection $tasks): void {
+        $this->tasks = $tasks;
+    }
+
+    public function addTask(Task $task): void {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setProject($this);
+        }
+    }
+
+    public function removeTask(Task $task): void {
+        if ($this->tasks->contains($task)) {
+            $this->tasks->removeElement($task);
+            if ($task->getProject() === $this) {
+                $task->setProject(null);
+            }
+        }
+    }
+
+    #[ORM\ManyToOne(targetEntity: ProjectsGroup::class, inversedBy: 'projects')]
+    #[ORM\JoinColumn(name: 'project_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?ProjectsGroup $projectsGroup = null;
+
+    public function getProjectsGroup(): ?ProjectsGroup {
+        return $this->projectsGroup;
+    }
+
+    public function setProjectsGroup(?ProjectsGroup $projectGroup): static {
+        $this->projectsGroup = $projectGroup;
+
+        return $this;
+    }
+
+    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DatetimeImmutable $createdAt;
 
     public function getCreatedAt(): \DateTimeImmutable {
@@ -62,7 +106,7 @@ class Project {
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: false)]
+    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTimeImmutable $updatedAt;
 
     public function getUpdatedAt(): \DateTimeImmutable {
