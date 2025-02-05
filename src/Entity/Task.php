@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 
+
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 #[ORM\Table(name: 'tasks')]
 #[ORM\HasLifecycleCallbacks()]
@@ -56,7 +57,21 @@ class Task {
         $this->description = $description;
     }
 
-    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'tasks')]
+    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private ?Project $project = null;
+
+    public function getProject(): ?Project {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): static {
+        $this->project = $project;
+
+        return $this;
+    }
+
+    #[ORM\Column(name: 'created_at', type: 'datetime_immutable', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DatetimeImmutable $createdAt;
 
     public function getCreatedAt(): \DateTimeImmutable {
@@ -73,7 +88,7 @@ class Task {
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'], nullable: false)]
+    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTimeImmutable $updatedAt;
 
     public function getUpdatedAt(): \DateTimeImmutable {
